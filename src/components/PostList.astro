@@ -3,20 +3,71 @@ import type { CollectionEntry } from 'astro:content';
 
 interface Props {
   posts: CollectionEntry<'blog'>[];
+  sortable?: boolean;
 }
 
-const { posts } = Astro.props;
+const { posts, sortable = false } = Astro.props;
 const fmt = (d: Date) =>
   d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
 ---
 
-<ul class="posts">
+<div class="post-list">
   {
-    posts.map((post) => (
-      <li>
-        <a href={`/blog/${post.id}/`}>{post.data.title}</a>
-        <time class="meta" datetime={post.data.date.toISOString()}>{fmt(post.data.date)}</time>
-      </li>
-    ))
+    sortable && posts.length > 1 && (
+      <div class="sort-row">
+        <button class="sort meta" type="button" data-order="desc" aria-label="Sort by date, newest first">
+          Date <span class="arrow" aria-hidden="true">↓</span>
+        </button>
+      </div>
+    )
   }
-</ul>
+  <ul class="posts">
+    {
+      posts.map((post) => (
+        <li>
+          <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+          <time class="meta" datetime={post.data.date.toISOString()}>{fmt(post.data.date)}</time>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .sort-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.25rem;
+  }
+  .sort {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0;
+    border: 0;
+    background: none;
+    font-family: inherit;
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+  .sort:hover { color: var(--ink); }
+  .sort:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.post-list .sort').forEach((btn) => {
+    btn.onclick = () => {
+      const list = btn.closest('.post-list')!.querySelector('.posts')!;
+      const asc = btn.dataset.order === 'desc';
+      btn.dataset.order = asc ? 'asc' : 'desc';
+      btn.querySelector('.arrow')!.textContent = asc ? '↑' : '↓';
+      btn.setAttribute('aria-label', `Sort by date, ${asc ? 'oldest' : 'newest'} first`);
+      const items = [...list.children].sort((a, b) => {
+        const da = a.querySelector('time')!.dateTime;
+        const db = b.querySelector('time')!.dateTime;
+        return asc ? da.localeCompare(db) : db.localeCompare(da);
+      });
+      list.append(...items);
+    };
+  });
+</script>

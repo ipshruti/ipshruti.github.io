@@ -18,7 +18,7 @@ const tags = await getTags();
       </ul>
     )
   }
-  {posts.length > 0 ? <PostList posts={posts} /> : <p class="meta">Nothing here yet.</p>}
+  {posts.length > 0 ? <PostList posts={posts} sortable /> : <p class="meta">Nothing here yet.</p>}
 </Base>
 
 <style>
