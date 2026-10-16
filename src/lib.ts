@@ -8,6 +8,19 @@ export async function getPosts() {
   return posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 }
 
+export const postYear = (post: { data: { date: Date } }) => post.data.date.getUTCFullYear();
+
+/** Years that have posts, newest first, each with its posts. */
+export async function getYears() {
+  const years = new Map<number, Awaited<ReturnType<typeof getPosts>>>();
+  for (const post of await getPosts()) {
+    const y = postYear(post);
+    if (!years.has(y)) years.set(y, []);
+    years.get(y)!.push(post);
+  }
+  return [...years.entries()].sort((a, b) => b[0] - a[0]).map(([year, posts]) => ({ year, posts }));
+}
+
 /** All tags with their posts, keyed by slug, most-used first. */
 export async function getTags() {
   const tags = new Map<string, { name: string; posts: Awaited<ReturnType<typeof getPosts>> }>();

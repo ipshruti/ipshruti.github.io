@@ -2,7 +2,7 @@
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Tags from '../../components/Tags.astro';
-import { getPosts } from '../../lib';
+import { getPosts, postYear } from '../../lib';
 
 export async function getStaticPaths() {
   const posts = await getPosts();
@@ -21,7 +21,9 @@ const date = post.data.date.toLocaleDateString('en-GB', {
     <header class="post-header">
       <h1>{post.data.title}</h1>
       <div class="byline">
-        <time class="meta" datetime={post.data.date.toISOString()}>{date}</time>
+        <a class="date meta" href={`/blog/${postYear(post)}/`} title={`All posts from ${postYear(post)}`}>
+          <time datetime={post.data.date.toISOString()}>{date}</time>
+        </a>
         <Tags tags={post.data.tags} />
       </div>
     </header>
@@ -33,6 +35,8 @@ const date = post.data.date.toLocaleDateString('en-GB', {
 
 <style>
   .post-header { margin-bottom: 2.5rem; }
+  .date { text-decoration: none; }
+  .date:hover { color: var(--ink); }
   .byline {
     display: flex;
     flex-direction: column;

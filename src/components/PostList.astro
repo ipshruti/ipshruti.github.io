@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { postYear } from '../lib';
 
 interface Props {
   posts: CollectionEntry<'blog'>[];
@@ -26,7 +27,9 @@ const fmt = (d: Date) =>
       posts.map((post) => (
         <li>
           <a href={`/blog/${post.id}/`}>{post.data.title}</a>
-          <time class="meta" datetime={post.data.date.toISOString()}>{fmt(post.data.date)}</time>
+          <a class="date meta" href={`/blog/${postYear(post)}/`} title={`All posts from ${postYear(post)}`}>
+            <time datetime={post.data.date.toISOString()}>{fmt(post.data.date)}</time>
+          </a>
         </li>
       ))
     }
@@ -34,6 +37,8 @@ const fmt = (d: Date) =>
 </div>
 
 <style>
+  .date { text-decoration: none; }
+  .date:hover { color: var(--ink); }
   .sort-row {
     display: flex;
     justify-content: flex-end;
