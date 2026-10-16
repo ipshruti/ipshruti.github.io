@@ -37,7 +37,7 @@
   --ink: #1d1b18;
   --muted: #77716a;
   --rule: #e6e1d8;
-  --accent: #9a3b1f;
+  --accent: #1d1b18;
   --code-bg: #f1ede6;
 
   --sans: 'Fira Sans', system-ui, sans-serif;
@@ -54,7 +54,7 @@
     --ink: #e9e5de;
     --muted: #8f8880;
     --rule: #2c2a27;
-    --accent: #e08b6b;
+    --accent: #e9e5de;
     --code-bg: #1f1d1b;
     color-scheme: dark;
   }
@@ -64,7 +64,7 @@
   --ink: #e9e5de;
   --muted: #8f8880;
   --rule: #2c2a27;
-  --accent: #e08b6b;
+  --accent: #e9e5de;
   --code-bg: #1f1d1b;
   color-scheme: dark;
 }
@@ -175,7 +175,10 @@ h1, h2, h3 {
   padding: 0.35rem 0;
 }
 .posts a { text-decoration: none; }
-.posts a:hover { color: var(--accent); }
+.posts a:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--muted);
+}
 @media (max-width: 600px) {
   .posts li { grid-template-columns: 1fr; gap: 0; padding: 0.5rem 0; }
 }

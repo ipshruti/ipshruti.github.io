@@ -56,8 +56,11 @@ const icon = { size: 17, strokeWidth: 1.75 };
     color: var(--muted);
     transition: color 0.15s;
   }
-  .links a:hover,
-  .links a:hover :global(svg) { color: var(--accent); }
+  .links a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--muted);
+  }
+  .links a:hover :global(svg) { color: var(--ink); }
 
   @media (max-width: 600px) {
     .home { padding-top: 0; }
