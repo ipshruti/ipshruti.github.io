@@ -11,9 +11,9 @@ export async function getStaticPaths() {
 const { name, posts } = Astro.props;
 ---
 
-<Base title={`#${name}`} description={`Posts tagged ${name}.`}>
+<Base title={name} description={`Posts tagged ${name}.`}>
   <p class="back"><a class="meta" href="/blog/">← All posts</a></p>
-  <h1 class="title">#{name}</h1>
+  <h1 class="title">{name}</h1>
   <PostList posts={posts} sortable />
 </Base>
 

@@ -37,7 +37,12 @@ const date = post.data.date.toLocaleDateString('en-GB', {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: 0.35rem 1rem;
+    gap: 0.35rem 0.5rem;
+  }
+  .byline :global(.tags)::before {
+    content: '·';
+    color: var(--muted);
+    font-size: 0.8rem;
   }
   .post-header h1 {
     font-size: 1.9rem;

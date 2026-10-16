@@ -13,7 +13,7 @@ const tags = await getTags();
     tags.length > 0 && (
       <ul class="tag-filter">
         {tags.map((t) => (
-          <li><a class="tag" href={`/blog/tags/${t.slug}/`}>#{t.name}</a></li>
+          <li><a class="tag" href={`/blog/tags/${t.slug}/`}>{t.name}</a></li>
         ))}
       </ul>
     )
