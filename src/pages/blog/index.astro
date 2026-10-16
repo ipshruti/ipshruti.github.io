@@ -1,34 +1,16 @@
 ---
 import Base from '../../layouts/Base.astro';
 import PostList from '../../components/PostList.astro';
-import { getPosts, getTags } from '../../lib';
+import { getPosts } from '../../lib';
 
 const posts = await getPosts();
-const tags = await getTags();
 ---
 
 <Base title="Writing">
   <h1 class="title">Writing</h1>
-  {
-    tags.length > 0 && (
-      <ul class="tag-filter">
-        {tags.map((t) => (
-          <li><a class="tag" href={`/blog/tags/${t.slug}/`}>{t.name}</a></li>
-        ))}
-      </ul>
-    )
-  }
   {posts.length > 0 ? <PostList posts={posts} sortable /> : <p class="meta">Nothing here yet.</p>}
 </Base>
 
 <style>
-  .title { font-size: 1.6rem; font-weight: 500; margin: 0 0 1rem; }
-  .tag-filter {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 2rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 0.9rem;
-  }
+  .title { font-size: 1.6rem; font-weight: 500; margin: 0 0 2rem; }
 </style>
