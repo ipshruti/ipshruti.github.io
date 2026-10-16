@@ -1,0 +1,16 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import { getPosts } from '../../lib';
+
+const posts = await getPosts();
+---
+
+<Base title="Writing">
+  <h1 class="title">Writing</h1>
+  {posts.length > 0 ? <PostList posts={posts} /> : <p class="meta">Nothing here yet.</p>}
+</Base>
+
+<style>
+  .title { font-size: 1.6rem; font-weight: 500; margin: 0 0 2rem; }
+</style>

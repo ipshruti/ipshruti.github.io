@@ -1,0 +1,67 @@
+---
+import { PenLine, FileUser } from '@lucide/astro';
+import Base from '../layouts/Base.astro';
+import BrandIcon from '../components/BrandIcon.astro';
+
+const icon = { size: 17, strokeWidth: 1.75 };
+---
+
+<Base bare>
+  <section class="home">
+    <h1>Shruti Priya</h1>
+    <div class="bio">
+      <p>
+        I write here about things I'm learning, building, and thinking about.
+      </p>
+      <p>
+        Elsewhere, I'm <span class="handle">@ipshruti</span>.
+      </p>
+    </div>
+    <ul class="links">
+      <li><a href="/blog/"><PenLine {...icon} aria-hidden="true" />Writing</a></li>
+      <li><a href="https://github.com/ipshruti"><BrandIcon name="github" {...icon} />GitHub</a></li>
+      <li><a href="https://www.linkedin.com/in/ipshruti/"><BrandIcon name="linkedin" {...icon} />LinkedIn</a></li>
+      <li><a href="/cv"><FileUser {...icon} aria-hidden="true" />CV</a></li>
+    </ul>
+  </section>
+</Base>
+
+<style>
+  .home { padding-top: 2vh; }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin: 0 0 1.25rem;
+  }
+  .bio { max-width: 36rem; color: var(--muted); font-size: 1.1rem; }
+  .bio p { margin: 0 0 0.5rem; }
+  .handle { color: var(--ink); }
+  .links {
+    list-style: none;
+    padding: 0;
+    margin: 2.25rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.75rem;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    text-decoration: none;
+  }
+  .links a :global(svg) {
+    flex: none;
+    color: var(--muted);
+    transition: color 0.15s;
+  }
+  .links a:hover,
+  .links a:hover :global(svg) { color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .home { padding-top: 0; }
+    h1 { font-size: 1.8rem; }
+    .bio { font-size: 1.05rem; }
+  }
+</style>

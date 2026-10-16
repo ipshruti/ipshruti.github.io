@@ -1,0 +1,58 @@
+---
+import '../styles/global.css';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import ThemeToggle from '../components/ThemeToggle.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  bare?: boolean;
+}
+
+const { title, description = SITE_DESCRIPTION, bare = false } = Astro.props;
+const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
+const path = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(path, Astro.site)} />
+    <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <script is:inline>
+      try {
+        const t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class:list={['site-header', { bare }]}>
+        {!bare && <a class="name" href="/">Shruti Priya</a>}
+        <nav>
+          {!bare && <a href="/blog/" aria-current={path.startsWith('/blog') ? 'page' : undefined}>writing</a>}
+          <ThemeToggle />
+        </nav>
+      </header>
+
+      <main>
+        <slot />
+      </main>
+
+      {!bare && (
+      <footer class="site-footer meta">
+        <span>© {new Date().getFullYear()}</span>
+        <a href="/rss.xml">rss</a>
+      </footer>
+      )}
+    </div>
+  </body>
+</html>
