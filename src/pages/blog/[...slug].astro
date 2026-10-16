@@ -1,6 +1,7 @@
 ---
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import Tags from '../../components/Tags.astro';
 import { getPosts } from '../../lib';
 
 export async function getStaticPaths() {
@@ -19,7 +20,10 @@ const date = post.data.date.toLocaleDateString('en-GB', {
   <article>
     <header class="post-header">
       <h1>{post.data.title}</h1>
-      <time class="meta" datetime={post.data.date.toISOString()}>{date}</time>
+      <div class="byline">
+        <time class="meta" datetime={post.data.date.toISOString()}>{date}</time>
+        <Tags tags={post.data.tags} />
+      </div>
     </header>
     <div class="prose">
       <Content />
@@ -29,6 +33,12 @@ const date = post.data.date.toLocaleDateString('en-GB', {
 
 <style>
   .post-header { margin-bottom: 2.5rem; }
+  .byline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 1rem;
+  }
   .post-header h1 {
     font-size: 1.9rem;
     font-weight: 500;

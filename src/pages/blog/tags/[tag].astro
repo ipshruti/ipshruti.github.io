@@ -1,0 +1,25 @@
+---
+import Base from '../../../layouts/Base.astro';
+import PostList from '../../../components/PostList.astro';
+import { getTags } from '../../../lib';
+
+export async function getStaticPaths() {
+  const tags = await getTags();
+  return tags.map((t) => ({ params: { tag: t.slug }, props: t }));
+}
+
+const { name, posts } = Astro.props;
+---
+
+<Base title={`#${name}`} description={`Posts tagged ${name}.`}>
+  <p class="back"><a class="meta" href="/blog/">← All posts</a></p>
+  <h1 class="title">#{name}</h1>
+  <PostList posts={posts} />
+</Base>
+
+<style>
+  .back { margin: 0 0 0.75rem; }
+  .back a { text-decoration: none; }
+  .back a:hover { color: var(--ink); }
+  .title { font-size: 1.6rem; font-weight: 500; margin: 0 0 2rem; }
+</style>

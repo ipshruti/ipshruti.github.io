@@ -181,6 +181,14 @@ h1, h2, h3 {
 }
 .posts time { white-space: nowrap; }
 
+/* Tags */
+.tag {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-decoration: none;
+}
+.tag:hover { color: var(--accent); }
+
 /* Prose */
 .prose {
   font-family: var(--serif);

@@ -17,6 +17,7 @@ Add a Markdown file to `src/content/blog/`. The file name becomes the URL, so `m
 title: My post
 description: One line about it.   # optional
 date: 2026-10-16
+tags: [design, notes]             # optional; each gets a page at /blog/tags/<tag>/
 draft: true                       # optional; drafts only show locally
 ---
 ```
