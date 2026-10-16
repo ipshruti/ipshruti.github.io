@@ -90,11 +90,16 @@ body {
 .wrap {
   max-width: calc(var(--measure) + 2 * var(--gutter));
   margin: 0 auto;
-  padding: 4.5rem var(--gutter) 4rem;
+  padding: 4.5rem var(--gutter) 2rem;
   --gutter: 2rem;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
 }
+.wrap > main { flex: 1; }
 @media (max-width: 600px) {
-  .wrap { padding-top: 2rem; padding-bottom: 2.5rem; --gutter: 1.1rem; }
+  .wrap { padding-top: 2rem; padding-bottom: 1.5rem; --gutter: 1.1rem; }
 }
 
 a {
