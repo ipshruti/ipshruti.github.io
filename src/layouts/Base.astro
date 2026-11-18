@@ -36,7 +36,7 @@ const path = Astro.url.pathname;
   <body>
     <div class="wrap">
       <header class:list={['site-header', { bare }]}>
-        {!bare && <a class="name" href="/">Shruti Priya</a>}
+        {!bare && <a class="name" href="/"><img class="avatar" src="/avatar.svg" alt="" width="36" height="36" />Shruti Priya</a>}
         <nav>
           {!bare && <a href="/blog/" aria-current={path.startsWith('/blog') ? 'page' : undefined}>writing</a>}
           <ThemeToggle />

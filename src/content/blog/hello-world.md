@@ -1,7 +1,7 @@
 ---
 title: Hello, world
 description: A first post.
-date: 2026-10-16
+date: 2026-01-08
 tags: [meta, writing]
 ---
 

@@ -2,6 +2,10 @@
 @import '@fontsource/fira-sans/400-italic.css';
 @import '@fontsource/fira-sans/500.css';
 @import '@fontsource/fira-mono/400.css';
+@import '@fontsource/merriweather/400.css';
+@import '@fontsource/merriweather/400-italic.css';
+@import '@fontsource/merriweather/700.css';
+@import '@fontsource/merriweather/700-italic.css';
 
 @font-face {
   font-family: 'Charter';
@@ -139,6 +143,8 @@ h1, h2, h3 {
 }
 .site-header a { text-decoration: none; }
 .site-header .name { font-size: 1.35rem; font-weight: 500; letter-spacing: -0.01em; }
+.site-header .name { display: inline-flex; align-items: center; gap: 0.6rem; }
+.site-header .avatar { border-radius: 50%; flex: none; }
 .site-header nav { display: flex; align-items: center; gap: 1.25rem; margin-left: auto; }
 .site-header nav a { color: var(--muted); }
 .site-header nav a:hover, .site-header nav a[aria-current] { color: var(--ink); }
@@ -194,12 +200,12 @@ h1, h2, h3 {
 
 /* Prose */
 .prose {
-  font-family: var(--serif);
-  font-size: 1.2rem;
+  font-family: 'Merriweather', var(--serif);
+  font-size: 0.92rem;
   line-height: 1.7;
   overflow-wrap: break-word;
 }
-@media (max-width: 600px) { .prose { font-size: 1.08rem; line-height: 1.65; } }
+@media (max-width: 600px) { .prose { font-size: 0.9rem; line-height: 1.65; } }
 .prose table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; }
 .prose th, .prose td { padding: 0.4em 0.8em; border-bottom: 1px solid var(--rule); text-align: left; }
 .prose iframe, .prose video { max-width: 100%; }
