@@ -1,0 +1,37 @@
+---
+// Oil painting under a post's title. Each post's scene lives in
+// src/paint/scenes/<post id>.ts; posts without one show nothing.
+const scenes = import.meta.glob('../paint/scenes/*.ts');
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+const has = `../paint/scenes/${id}.ts` in scenes;
+---
+
+{has && <figure class="post-art" aria-hidden="true"><canvas data-scene={id}></canvas></figure>}
+
+<script>
+  import { keepPainted } from '../paint/engine';
+
+  const scenes = import.meta.glob<{ default: (c: HTMLCanvasElement) => void }>('../paint/scenes/*.ts');
+  for (const canvas of document.querySelectorAll<HTMLCanvasElement>('.post-art canvas')) {
+    const load = scenes[`../paint/scenes/${canvas.dataset.scene}.ts`];
+    // The painting is the same in light and dark mode, so only repaint on resize.
+    load?.().then((m) => keepPainted(canvas, () => m.default(canvas), false));
+  }
+</script>
+
+<style>
+  .post-art { margin: 1.5rem 0 1.25rem; }
+  .post-art :global(canvas) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 1;
+    border-radius: 4px;
+    background: #e9b8a8;
+  }
+  @media (max-width: 600px) { .post-art :global(canvas) { aspect-ratio: 2.2 / 1; } }
+</style>

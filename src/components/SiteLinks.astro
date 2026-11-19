@@ -1,0 +1,14 @@
+---
+// The site's main links, shared by the landing page and the page header.
+// Renders <li> items; the parent <ul> owns the layout.
+import { PenLine, FileUser } from '@lucide/astro';
+import BrandIcon from './BrandIcon.astro';
+
+const icon = { size: 16, strokeWidth: 1.75 };
+const path = Astro.url.pathname;
+---
+
+<li><a href="/blog/" aria-current={path.startsWith('/blog') ? 'page' : undefined}><PenLine {...icon} aria-hidden="true" />Writing</a></li>
+<li><a href="https://github.com/ipshruti"><BrandIcon name="github" {...icon} />GitHub</a></li>
+<li><a href="https://www.linkedin.com/in/ipshruti/"><BrandIcon name="linkedin" {...icon} />LinkedIn</a></li>
+<li><a href="/cv"><FileUser {...icon} aria-hidden="true" />CV</a></li>

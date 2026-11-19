@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- The home page landscape in miniature: sunset sky, low sun, hills, water. -->
+  <defs>
+    <clipPath id="tile"><rect width="64" height="64" rx="14" /></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6c7a2" />
+      <stop offset="0.55" stop-color="#e89196" />
+      <stop offset="1" stop-color="#b07aa8" />
+    </linearGradient>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5b6aa6" />
+      <stop offset="1" stop-color="#262f5c" />
+    </linearGradient>
+    <radialGradient id="glow" cx="0.38" cy="0.6" r="0.4">
+      <stop offset="0" stop-color="#ffe2a0" stop-opacity="0.9" />
+      <stop offset="1" stop-color="#ffe2a0" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <g clip-path="url(#tile)">
+    <rect width="64" height="64" fill="url(#sky)" />
+    <rect width="64" height="64" fill="url(#glow)" />
+    <path d="M-2 17 C10 13 18 19 30 16 S50 12 66 17 V22 C52 19 40 23 28 21 S8 21 -2 23 Z" fill="#6b67ae" opacity="0.85" />
+    <circle cx="24" cy="38" r="7" fill="#fff1cf" />
+    <path d="M-2 40 C8 32 16 34 26 38 C34 41 44 30 66 34 V44 H-2 Z" fill="#5a4f93" />
+    <rect y="42" width="64" height="22" fill="url(#sea)" />
+    <path d="M18 46 H30 M20 50 H28 M21 54 H27" stroke="#ffe2a0" stroke-width="2" stroke-linecap="round" />
+    <path d="M38 64 C44 52 54 46 66 44 V64 Z" fill="#1b2546" />
+  </g>
+</svg>

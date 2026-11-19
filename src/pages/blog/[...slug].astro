@@ -3,6 +3,7 @@ import { render } from 'astro:content';
 import { ArrowLeft } from '@lucide/astro';
 import Base from '../../layouts/Base.astro';
 import Tags from '../../components/Tags.astro';
+import PostArt from '../../components/PostArt.astro';
 import { getPosts, postYear } from '../../lib';
 
 export async function getStaticPaths() {
@@ -22,6 +23,7 @@ const date = post.data.date.toLocaleDateString('en-GB', {
   <article>
     <header class="post-header">
       <h1>{post.data.title}</h1>
+      <PostArt id={post.id} />
       <div class="byline">
         <a class="date meta" href={`/blog/${postYear(post)}/`} title={`All posts from ${postYear(post)}`}>
           <time datetime={post.data.date.toISOString()}>{date}</time>

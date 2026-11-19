@@ -2,14 +2,18 @@
 import '../styles/global.css';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import ThemeToggle from '../components/ThemeToggle.astro';
+import SiteLinks from '../components/SiteLinks.astro';
+import PaintedLandscape from '../components/PaintedLandscape.astro';
 
 interface Props {
   title?: string;
   description?: string;
   bare?: boolean;
+  /** Page draws its own full-width layout: no header, footer or column. */
+  full?: boolean;
 }
 
-const { title, description = SITE_DESCRIPTION, bare = false } = Astro.props;
+const { title, description = SITE_DESCRIPTION, bare = false, full = false } = Astro.props;
 const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
 const path = Astro.url.pathname;
 ---
@@ -24,6 +28,9 @@ const path = Astro.url.pathname;
     <link rel="canonical" href={new URL(path, Astro.site)} />
     <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <script is:inline>
@@ -34,11 +41,12 @@ const path = Astro.url.pathname;
     </script>
   </head>
   <body>
+    {full ? <slot /> : (
     <div class="wrap">
       <header class:list={['site-header', { bare }]}>
-        {!bare && <a class="name" href="/"><img class="avatar" src="/avatar.svg" alt="" width="36" height="36" />Shruti Priya</a>}
+        {!bare && <a class="name" href="/">Shruti Priya</a>}
         <nav>
-          {!bare && <a href="/blog/" aria-current={path.startsWith('/blog') ? 'page' : undefined}>writing</a>}
+          {!bare && <ul class="site-links"><SiteLinks /></ul>}
           <ThemeToggle />
         </nav>
       </header>
@@ -49,10 +57,12 @@ const path = Astro.url.pathname;
 
       {!bare && (
       <footer class="site-footer meta">
-        <span>© {new Date().getFullYear()} Shruti Priya</span>
+        <span>All content copyright © Shruti Priya unless otherwise noted.</span>
         <a href="/rss.xml">rss</a>
       </footer>
       )}
+      {!bare && <div class="footer-art"><PaintedLandscape /></div>}
     </div>
+    )}
   </body>
 </html>

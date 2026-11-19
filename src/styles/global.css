@@ -2,6 +2,7 @@
 @import '@fontsource/fira-sans/400-italic.css';
 @import '@fontsource/fira-sans/500.css';
 @import '@fontsource/fira-mono/400.css';
+@import '@fontsource/merriweather/300.css';
 @import '@fontsource/merriweather/400.css';
 @import '@fontsource/merriweather/400-italic.css';
 @import '@fontsource/merriweather/700.css';
@@ -47,6 +48,7 @@
   --sans: 'Fira Sans', system-ui, sans-serif;
   --serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, Georgia, serif;
   --mono: 'Fira Mono', ui-monospace, Menlo, monospace;
+  --display: 'Merriweather', var(--serif);
   --measure: 52rem;
   color-scheme: light;
 }
@@ -142,12 +144,46 @@ h1, h2, h3 {
   .site-header.bare { margin-bottom: 1rem; }
 }
 .site-header a { text-decoration: none; }
-.site-header .name { font-size: 1.35rem; font-weight: 500; letter-spacing: -0.01em; }
+.site-header .name { font-family: var(--display); font-size: 1.4rem; font-weight: 400; letter-spacing: -0.02em; }
 .site-header .name { display: inline-flex; align-items: center; gap: 0.6rem; }
-.site-header .avatar { border-radius: 50%; flex: none; }
 .site-header nav { display: flex; align-items: center; gap: 1.25rem; margin-left: auto; }
-.site-header nav a { color: var(--muted); }
-.site-header nav a:hover, .site-header nav a[aria-current] { color: var(--ink); }
+.site-links { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.4rem; }
+.site-header .site-links { font-size: 0.88rem; gap: 1.2rem; }
+.site-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0;
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.site-links a:hover { color: var(--ink); border-bottom-color: var(--muted); }
+.site-links a[aria-current] { color: var(--ink); }
+/* On phones the icons say enough. */
+@media (max-width: 600px) {
+  .site-header { flex-wrap: wrap; }
+  .site-header .site-links { gap: 1rem; }
+  .site-header .site-links a { font-size: 0; gap: 0; }
+  .site-header .site-links a svg { width: 19px; height: 19px; }
+}
+
+/* Page titles share the landing page's display face. */
+.title, .post-header h1 { font-family: var(--display); font-weight: 300 !important; letter-spacing: -0.03em; }
+
+/* A strip of the landscape painting under the footer, full width, fading up. */
+body { overflow-x: clip; }
+.footer-art {
+  position: relative;
+  width: 100vw;
+  height: 190px;
+  margin: 1.5rem 0 calc(-1 * 2rem) calc(50% - 50vw);
+  -webkit-mask-image: linear-gradient(transparent, #000 55%);
+  mask-image: linear-gradient(transparent, #000 55%);
+}
+.footer-art canvas { position: absolute; inset: 0; }
+@media (max-width: 600px) { .footer-art { margin-bottom: -1.5rem; height: 150px; } }
 
 /* Footer */
 .site-footer {

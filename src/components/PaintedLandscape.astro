@@ -1,0 +1,190 @@
+---
+// Sunset landscape (moonrise in dark mode), painted at load with the shared
+// oil-painting engine, then trees, village lights and birds on top. Seeded,
+// so every visit paints the same picture. The pale sky at the top is meant
+// to fade into the page.
+---
+
+<canvas class="painted-landscape" aria-hidden="true"></canvas>
+
+<script>
+  import { clamp01, css, dab, fbm, grain, isDark, keepPainted, mix, noise, paintField, prepare, type Cell, type RGB } from '../paint/engine';
+
+  const DAY = {
+    PAPER: [250, 244, 232], PEACH: [248, 200, 164], ROSE: [238, 150, 150],
+    GOLD: [252, 214, 128], SUN: [255, 244, 210], TURQ: [150, 206, 210],
+    CLOUD_SHADE: [92, 100, 168], CLOUD_DEEP: [66, 72, 140], CLOUD_LIT: [250, 188, 168],
+    FAR_HILL: [176, 138, 176], NEAR_HILL: [92, 88, 150], NEAR_LIT: [214, 140, 150],
+    WATER: [70, 96, 150], LAND: [38, 62, 92], LAND_LIT: [72, 120, 126], NIGHT: [26, 34, 66],
+    LEAF_LIT: [196, 120, 110], BIRD: 'rgba(52,56,100,0.75)', stars: false,
+  };
+  // Same scene by moonrise: indigo sky, silver light, warmer windows.
+  const NIGHT_SCENE: typeof DAY = {
+    PAPER: [24, 26, 40], PEACH: [34, 40, 78], ROSE: [72, 62, 112],
+    GOLD: [206, 196, 160], SUN: [250, 244, 222], TURQ: [44, 64, 104],
+    CLOUD_SHADE: [36, 40, 76], CLOUD_DEEP: [24, 26, 54], CLOUD_LIT: [168, 168, 206],
+    FAR_HILL: [62, 60, 104], NEAR_HILL: [34, 36, 72], NEAR_LIT: [98, 104, 150],
+    WATER: [30, 44, 84], LAND: [16, 26, 42], LAND_LIT: [36, 62, 74], NIGHT: [10, 14, 28],
+    LEAF_LIT: [130, 140, 180], BIRD: 'rgba(200,200,230,0.5)', stars: true,
+  } as const as typeof DAY;
+  let P = DAY as { [K in keyof typeof DAY]: (typeof DAY)[K] extends number[] ? RGB : (typeof DAY)[K] };
+
+  // Layout, in fractions of the canvas (u across, v down).
+  // The top of the canvas is open sky that fades into the page; the scene
+  // itself (clouds, hills, water, shore) starts below it.
+  const TOP = 0.22;
+  const sceneV = (y: number, h: number) => (y / h - TOP) / (1 - TOP);
+  const toY = (v: number, h: number) => (TOP + v * (1 - TOP)) * h;
+  const HORIZON = 0.6;
+  const SUN_U = 0.36, SUN_V = 0.555;
+
+  const farRidge = (u: number) =>
+    0.46 - 0.1 * Math.exp(-(((u - 0.78) / 0.14) ** 2)) - 0.05 * fbm(u * 5, 1.5);
+  const nearRidge = (u: number) =>
+    0.6 - 0.16 * Math.exp(-(((u - 0.08) / 0.16) ** 2)) - 0.11 * Math.exp(-(((u - 0.94) / 0.12) ** 2)) - 0.035 * fbm(u * 9, 4.2);
+  const shore = (u: number) =>
+    0.84 - 0.2 * clamp01((u - 0.55) / 0.45) ** 1.4 - 0.03 * fbm(u * 7, 8.1);
+
+  function skyColour(u: number, v: number, aspect: number): RGB {
+    let c = mix(P.PAPER, P.PEACH, clamp01((v - 0.05) / 0.3));
+    c = mix(c, P.ROSE, clamp01((v - 0.32) / 0.16) * 0.8);
+    c = mix(c, P.TURQ, clamp01(noise(u * 3 * aspect, v * 4) - 0.55) * 1.6 * clamp01((0.45 - v) * 4) * clamp01(v * 5));
+    // Sun glow low in the sky.
+    const ds = Math.hypot((u - SUN_U) * aspect, (v - SUN_V) * 1.6);
+    c = mix(c, P.GOLD, clamp01(1 - ds / 0.35) ** 2 * 0.85);
+    c = mix(c, P.SUN, clamp01(1 - ds / 0.06));
+
+    // Cumulus band: shaded blue-violet, lit pink where the sun reaches below.
+    const n = fbm(u * 1.7 * aspect + 2, v * 2.6);
+    const band = Math.exp(-(((v - 0.33) / 0.12) ** 2));
+    const cloud = clamp01((n * band - 0.32) * 10);
+    const below = fbm(u * 1.7 * aspect + 2, (v + 0.035) * 2.6);
+    const lit = clamp01((n - below) * 9 + (v - 0.2) * 1.5);
+    const shade = mix(P.CLOUD_SHADE, P.CLOUD_DEEP, clamp01((n - 0.6) * 4));
+    return mix(c, mix(shade, P.CLOUD_LIT, lit), cloud);
+  }
+
+  function scene(u: number, y: number, aspect: number): Cell {
+    const v = y;
+    const sh = shore(u);
+    if (v > sh) {
+      const t = clamp01((v - sh) / 0.12);
+      const lit = clamp01(1 - t * 2) * clamp01(noise(u * 30, v * 30) * 1.4 - 0.3);
+      return { c: mix(mix(P.LAND, P.NIGHT, t * 0.6), P.LAND_LIT, lit * 0.7), angle: -0.35, zone: 'land' };
+    }
+    if (v > HORIZON) {
+      // Water mirrors the sky above, darker and bluer with depth.
+      const m = HORIZON - (v - HORIZON) * 1.2;
+      let c = mix(skyColour(u, Math.max(0.02, m), aspect), P.WATER, 0.45 + clamp01((v - HORIZON) * 4) * 0.4);
+      const glitter = Math.exp(-(((u - SUN_U) * aspect / (0.03 + (v - HORIZON) * 0.4)) ** 2));
+      c = mix(c, P.GOLD, glitter * 0.75 * clamp01(noise(u * 40, v * 90) * 1.6 - 0.4));
+      return { c, angle: 0, zone: 'water', calm: true };
+    }
+    const nr = nearRidge(u);
+    if (v > nr) {
+      const slope = (nearRidge(u + 0.004) - nearRidge(u - 0.004)) / 0.008;
+      const sunSide = clamp01(-Math.sign(u - SUN_U) * slope * 0.8 + 0.2);
+      const c = mix(mix(P.NEAR_HILL, P.NEAR_LIT, sunSide * clamp01(1 - (v - nr) * 6)), P.NIGHT, clamp01((v - nr) * 3) * 0.4);
+      return { c, angle: Math.atan(slope / aspect) + 0.5, zone: 'near' };
+    }
+    const fr = farRidge(u);
+    if (v > fr) {
+      const c = mix(P.FAR_HILL, mix(skyColour(u, v, aspect), P.ROSE, 0.3), 0.35 + clamp01((v - fr) * 4) * 0.25);
+      return { c, angle: Math.atan((farRidge(u + 0.004) - farRidge(u - 0.004)) / 0.008 / aspect), zone: 'far' };
+    }
+    // Sky strokes follow the cloud contours.
+    const e = 0.004;
+    const gx = fbm((u + e) * 1.7 * aspect + 2, v * 2.6) - fbm((u - e) * 1.7 * aspect + 2, v * 2.6);
+    const gy = fbm(u * 1.7 * aspect + 2, (v + e) * 2.6) - fbm(u * 1.7 * aspect + 2, (v - e) * 2.6);
+    let contour = Math.atan2(gy, gx) + Math.PI / 2;
+    contour = Math.atan(Math.tan(contour)); // fold into (-90°, 90°)
+    const angle = Math.hypot(gx, gy) > 0.002 ? Math.max(-0.45, Math.min(0.45, contour * 0.5)) : -0.08;
+    return { c: skyColour(u, v, aspect), angle, zone: 'sky' };
+  }
+
+  function paint(canvas: HTMLCanvasElement) {
+    P = (isDark() ? NIGHT_SCENE : DAY) as typeof P;
+    const box = prepare(canvas);
+    if (!box) return;
+    const { ctx, w, h, k } = box;
+    const aspect = w / h;
+
+    const r = paintField(ctx, w, h, (u, v) => scene(u, sceneV(v * h, h), aspect), {
+      seed: 42,
+      k,
+      // Impasto on lit cloud edges and the sun's path on the water.
+      highlight: (cell, u, v, r) => {
+        const sv = sceneV(v * h, h);
+        const bright = (cell.c[0] + cell.c[1] + cell.c[2]) / 3;
+        if (cell.zone === 'sky' && bright > 200 && r() < 0.5) return css(mix(cell.c, P.SUN, 0.5), 0, 0.7);
+        if (cell.zone === 'water' && Math.abs(u - SUN_U) * aspect < 0.02 + (sv - HORIZON) * 0.4 && r() < 0.6) return css(P.SUN, 0, 0.5 + r() * 0.4);
+        return null;
+      },
+    });
+
+    // 6. Trees along the shore: tall cypresses and round shrubs, built from dabs.
+    const tree = (x: number, base: number, height: number, round: boolean) => {
+      const n = Math.round(height * (round ? 2.2 : 1.6));
+      for (let i = 0; i < n; i++) {
+        const t = r();
+        const y = base - t * height;
+        const spread = round ? Math.sin(Math.PI * t) * height * 0.45 : (1 - t) * height * 0.16 + 1;
+        const px = x + (r() - 0.5) * 2 * spread;
+        const light = px < x ? 0.35 * r() : 0; // sun-side leaves catch a little colour
+        dab(ctx, px, y, (2 + r() * 5) * k, -Math.PI / 2 + (r() - 0.5) * 0.6, (1.5 + r() * 2.5) * k, css(mix(mix([24, 44, 62], [34, 70, 76], r()), P.LEAF_LIT, light), 0, 0.9));
+      }
+    };
+    for (let i = 0; i < 26; i++) {
+      const u = 0.58 + r() * 0.42;
+      const base = toY(shore(u), h) + 6;
+      const tall = r() < 0.55;
+      // Trees scale with the canvas height too, so short strips keep their proportions.
+      tree(u * w, base, (tall ? 40 + r() * 50 : 16 + r() * 18) * k * Math.min(1, h / 480), !tall);
+    }
+
+    // 7. A village on the shore: little lit windows, warm against the dusk.
+    for (let i = 0; i < 70; i++) {
+      const u = 0.6 + r() * 0.4;
+      const y = toY(shore(u), h) + (8 + r() * 0.12 * h);
+      if (y > h) continue;
+      ctx.fillStyle = css(P.GOLD, (r() - 0.5) * 30, 0.6 + r() * 0.4);
+      ctx.fillRect(u * w, y, (2 + r() * 3) * k, (1.5 + r() * 1.5) * k);
+    }
+
+    // 8. Birds heading home.
+    ctx.strokeStyle = P.BIRD;
+    ctx.lineWidth = 1.3 * k;
+    for (let i = 0; i < 9; i++) {
+      const x = w * (0.5 + r() * 0.25), y = toY(0.36 + r() * 0.08, h), s = (4 + r() * 5) * k;
+      ctx.beginPath();
+      ctx.moveTo(x - s, y - s * 0.35);
+      ctx.quadraticCurveTo(x - s * 0.4, y - s * 0.5, x, y);
+      ctx.quadraticCurveTo(x + s * 0.4, y - s * 0.5, x + s, y - s * 0.35);
+      ctx.stroke();
+    }
+
+    // Stars, at night only, thinning towards the horizon.
+    if (P.stars) {
+      for (let i = 0; i < (w * h) / 2500; i++) {
+        const x = r() * w, y = h * Math.pow(r(), 1.8) * 0.45;
+        if (scene(x / w, sceneV(y, h), aspect).zone !== 'sky') continue;
+        ctx.fillStyle = `rgba(255,246,226,${0.3 + r() * 0.6})`;
+        const s = (0.8 + r() * 1.6) * k;
+        ctx.fillRect(x, y, s, s);
+      }
+    }
+
+    grain(ctx, w, h, r);
+  }
+
+  const canvas = document.querySelector<HTMLCanvasElement>('.painted-landscape');
+  if (canvas) keepPainted(canvas, () => paint(canvas));
+</script>
+
+<style>
+  .painted-landscape {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>
