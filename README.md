@@ -1,6 +1,16 @@
-# pshruti.com
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/readme/banner-dark.jpg">
+  <img alt="Shruti Priya, over a painted sunset landscape" src=".github/readme/banner-light.jpg">
+</picture>
 
-Personal site built with [Astro](https://astro.build).
+<p align="center">
+  <a href="https://pshruti.com"><b>pshruti.com</b></a> ·
+  <a href="https://pshruti.com/blog/">Writing</a> ·
+  <a href="https://github.com/ipshruti">GitHub</a> ·
+  <a href="https://www.linkedin.com/in/ipshruti/">LinkedIn</a>
+</p>
+
+Notes on software testing, and what I'm learning. Built with [Astro](https://astro.build).
 
 ```sh
 npm install
