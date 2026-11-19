@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pshruti.com/sitemap-index.xml

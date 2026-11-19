@@ -1,4 +1,6 @@
 ---
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { render } from 'astro:content';
 import { ArrowLeft } from '@lucide/astro';
 import Base from '../../layouts/Base.astro';
@@ -13,12 +15,14 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
+// Posts with their own share card in public/og/ use it; others get the site card.
+const ogImage = existsSync(join(process.cwd(), 'public', 'og', `${post.id}.jpg`)) ? `/og/${post.id}.jpg` : undefined;
 const date = post.data.date.toLocaleDateString('en-GB', {
   day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
 });
 ---
 
-<Base title={post.data.title} description={post.data.description}>
+<Base title={post.data.title} description={post.data.description} image={ogImage} article={{ published: post.data.date, tags: post.data.tags }}>
   <a class="back meta" href="/blog/"><ArrowLeft size={16} aria-hidden="true" />All posts</a>
   <article>
     <header class="post-header">
