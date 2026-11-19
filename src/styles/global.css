@@ -50,6 +50,9 @@
   --mono: 'Fira Mono', ui-monospace, Menlo, monospace;
   --display: 'Merriweather', var(--serif);
   --measure: 52rem;
+  /* Two different tiles at unrelated sizes, blended, so the texture never visibly repeats. */
+  --paper: url('/paper-light-a.webp') 0 0 / 523px, url('/paper-light-b.webp') 211px 97px / 811px;
+  --paper-blend: multiply, normal;
   color-scheme: light;
 }
 
@@ -62,6 +65,8 @@
     --rule: #2c2a27;
     --accent: #e9e5de;
     --code-bg: #1f1d1b;
+    --paper: url('/paper-dark-a.webp') 0 0 / 523px, url('/paper-dark-b.webp') 211px 97px / 811px;
+    --paper-blend: lighten, normal;
     color-scheme: dark;
   }
 }
@@ -72,6 +77,8 @@
   --rule: #2c2a27;
   --accent: #e9e5de;
   --code-bg: #1f1d1b;
+  --paper: url('/paper-dark-a.webp') 0 0 / 523px, url('/paper-dark-b.webp') 211px 97px / 811px;
+  --paper-blend: lighten, normal;
   color-scheme: dark;
 }
 
@@ -85,7 +92,10 @@ html {
 
 body {
   margin: 0;
-  background: var(--bg);
+  /* White oil paint on canvas. */
+  background: var(--paper);
+  background-color: var(--bg);
+  background-blend-mode: var(--paper-blend);
   color: var(--ink);
   font-family: var(--sans);
   line-height: 1.6;
