@@ -1,0 +1,67 @@
+---
+// Adds a copy icon to every code block in a post.
+---
+
+<script>
+  const icon = (paths: string) =>
+    `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+  const COPY = icon('<rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>');
+  const DONE = icon('<path d="M20 6 9 17l-5-5"/>');
+
+  for (const pre of document.querySelectorAll<HTMLPreElement>('.prose pre')) {
+    // Wrap so the button stays put while the code scrolls sideways.
+    const wrap = document.createElement('div');
+    wrap.className = 'code-block';
+    pre.replaceWith(wrap);
+    wrap.append(pre);
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy-code';
+    button.setAttribute('aria-label', 'Copy code');
+    button.innerHTML = COPY;
+    let timer = 0;
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pre.querySelector('code')?.innerText ?? pre.innerText);
+      } catch {
+        return;
+      }
+      button.innerHTML = DONE;
+      button.setAttribute('aria-label', 'Copied');
+      clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        button.innerHTML = COPY;
+        button.setAttribute('aria-label', 'Copy code');
+      }, 1500);
+    });
+    wrap.append(button);
+  }
+</script>
+
+<style is:global>
+  .code-block { position: relative; }
+  .copy-code {
+    position: absolute;
+    top: 0.45rem;
+    right: 0.45rem;
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: var(--code-bg);
+    color: var(--muted);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s, color 0.15s;
+  }
+  .code-block:hover .copy-code,
+  .copy-code:focus-visible { opacity: 1; }
+  .copy-code:hover { color: var(--ink); }
+  .copy-code:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  /* Touch screens have no hover: always show it. */
+  @media (hover: none) { .copy-code { opacity: 1; } }
+</style>

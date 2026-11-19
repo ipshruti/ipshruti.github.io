@@ -6,6 +6,7 @@ import { ArrowLeft } from '@lucide/astro';
 import Base from '../../layouts/Base.astro';
 import Tags from '../../components/Tags.astro';
 import PostArt from '../../components/PostArt.astro';
+import CopyCode from '../../components/CopyCode.astro';
 import { getPosts, postYear } from '../../lib';
 
 export async function getStaticPaths() {
@@ -38,6 +39,7 @@ const date = post.data.date.toLocaleDateString('en-GB', {
     <div class="prose">
       <Content />
     </div>
+    <CopyCode />
   </article>
 </Base>
 
